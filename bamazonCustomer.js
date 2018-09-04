@@ -61,18 +61,25 @@ function manageProduct () {
             message : "what is the ID of the item you would like to purchase [Quit with Q]",
             name : "userItem"
         }
-    ]).then(function(response){    
+    ]).then(function(response){ 
+        // if the input is either q or Q   
         if ((response.userItem).toLowerCase() === "q"){
             exit();
-        } else if (!isNaN(response.userItem)){
-            console.log(" the ID you entered is " + response.userItem);
+        } //check if the id is a number 
+        else if (!isNaN(response.userItem)){
+            // console.log(" the ID you entered is  a number");
 
-            if (idAvailable(parseInt(response.userItem))){
-                console.log("the id you entered is not available please enter again");
+            //check if the number user entered exists in the list of item ids  
+            if (!idAvailable(parseInt(response.userItem))){
+                console.log("the id you entered is not available please try again");
                 manageProduct();
+            } // if id is a valide number; here is where all the action happens: 
+            else {
+                takeOrder(parseInt(response.userItem));
             }
 
-        } else {
+        } // if the input is any other than Q or a number  
+        else {
             console.log(" this input is not acceptable");
             manageProduct();
 
@@ -81,6 +88,31 @@ function manageProduct () {
     });
 } 
 
+function validate(input, callback1 , callback2){
+    // if the input is either q or Q   
+    if ((input).toLowerCase() === "q"){
+        exit();
+    }//check if the id is a number 
+    else if (!isNaN(input)){
+        // console.log(" the ID you entered is  a number");
+
+        //check if the number user entered exists in the list of item ids  
+        if (!idAvailable(parseInt(input))){
+            console.log("the id you entered is not available please try again");
+            callback1();
+        } // if id is a valide number; here is where all the action happens: 
+        else {
+            callback2(input);
+        }
+
+    } // if the input is any other than Q or a number  
+    else {
+        console.log(" this input is not acceptable");
+        callback1();
+
+    } 
+}
+
 
 function idAvailable(id){
     var checkId = false;
@@ -88,18 +120,29 @@ function idAvailable(id){
     connection.query("SELECT item_id FROM products", function(err, data){
         if (err) throw err;
         for(var i = 0; i < data.length ; i++){
-            ids.push(data[i].item_id);
+            ids.push(parseInt(data[i].item_id));
         }
-        console.log(ids);
         if(ids.includes(id)) {
             checkId = true;
-            console.log("hey");
-            return true;
         } else{
             checkId = false;
-            return false;
-        }
-        
+        }       
     });
-    console.log(checkId);
+    if (checkId){
+        return true;
+    }
+    return false;
+    
+}
+
+function takeOrder (id){
+    inquirer.prompt([
+        {
+            type: "input",
+            message:"How many would you like? [Quit with Q]",
+            name : "quantity"
+        }
+    ]).then(function(response){
+
+    });
 }
