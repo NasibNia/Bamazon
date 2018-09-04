@@ -54,7 +54,7 @@ function manageProduct () {
         }
     ]).then(function(response){ 
         
-        validate(response.userItem , "item_id", manageProduct , takeOrder); 
+        validateId(response.userItem ,  manageProduct , takeOrder); 
 
     });
 } 
@@ -67,40 +67,40 @@ function takeOrder (id){
             name : "quantity"
         }
     ]).then(function(response){
-        validate(response.quantity , "stock_quantity" , takeOrder ,findProduct(id,parseInt(response.quantity)));
+        validateQuantity(id , response.quantity , takeOrder ,updateProducts);
 
     });
 }
 
-function findProduct (id , buyerOrder) {
-    var queryString = "SELECT * FROM products WHERE ? ";
-    connection.query(queryString,
-        {
-            item_id : id
-        } , function(err, data){
-        if (err) throw err;
+// function findProduct (id , buyerOrder) {
+//     var queryString = "SELECT * FROM products WHERE ? ";
+//     connection.query(queryString,
+//         {
+//             item_id : id
+//         } , function(err, data){
+//         if (err) throw err;
         
-        var onStockNumbers = parseInt(data.stock_quantity);
+//         var onStockNumbers = parseInt(data.stock_quantity);
         
-        if (buyerOrder <= onStockNumbers) {
-            console.log("congrats, you are about to buy " + buyerOrder + "of item id " + id + "( " + data.product_name + " )\n");
-            var updatedNumbers = onStockNumbers - buyerOrder; 
-            updateProducts(id , updatedNumbers);
-        } else {
-            console.log ("sorry we do not have the number you asked in the stock, please enter a valid number");
-            takeOrder(id);
-        }
-    });
-}
+//         if (buyerOrder <= onStockNumbers) {
+//             console.log("congrats, you are about to buy " + buyerOrder + "of item id " + id + "( " + data.product_name + " )\n");
+//             var updatedNumbers = onStockNumbers - buyerOrder; 
+//             updateProducts(id , updatedNumbers);
+//         } else {
+//             console.log ("sorry we do not have the number you asked in the stock, please enter a valid number");
+//             takeOrder(id);
+//         }
+//     });
+// }
 
-function updateProducts(item , numbers) {
+function updateProducts(id , numbers) {
     var queryString = "UPDATE products SET ? WHERE ?";
     connection.query(queryString,[
         {
              stock_quantity : numbers
         },
         {
-            item_id : item
+            item_id : id
         }] , function(err, data){
         if (err) throw err;
         console.log("great! your purchase completed, Here is an updated list of products:");
@@ -111,15 +111,62 @@ function updateProducts(item , numbers) {
 }
 
 
-function validate(input, category , callback1 , callback2){
-    var options = [];
-    var variable;
-    if(category === "item_id"){
-        variable = "item_id";
-    } else if (category === "stock_quantity"){
-        variable = "stock_quantity";
-    }
+// function validate(input, category , callback1 , callback2){
+//     var options = [];
+//     var variable;
+//     if(category === "id_id"){
+//         variable = "item_id";
+//     } else if (category === "stock_quantity"){
+//         variable = "stock_quantity";
+//     }
     
+//     // if the input is either q or Q   
+//     if ((input).toLowerCase() === "q"){
+//         exit();
+//     }//check if the id is a number 
+//     else if (!isNaN(input)){
+//         // console.log(" the ID you entered is  a number");
+//         //check if the number user entered exists in the list of item options  
+//             var querySrt = "SELECT " + variable + " FROM products" ;
+//             connection.query(querySrt , function(err, data){
+//                 if (err) throw err;
+//                 console.log (querySrt);
+//                 // console.log(data);
+//                 for(var i = 0; i < data.length ; i++){
+//                     options.push(parseInt(data[i][variable]));
+//                 }
+//                 // console.log(options);
+//                 // console.log(input);
+//                 if(category === "item_id"){
+//                     if(options.includes(parseInt(input))) {
+//                         console.log("inside true");
+//                         callback2();        
+//                     } else{
+//                         console.log("inside false");                    
+//                         callback1();
+//                     } 
+//                 } else {
+//                     if(parseInt(input) > 0 ) {
+//                         console.log("this value is more than what we have in stock ");
+//                         callback2();
+//                     } else{
+//                         console.log("great! we have this amount in our stock");
+//                         callback1();
+//                     }
+//                 }
+                
+//             });    
+
+//     } // if the input is any other than Q or a number  
+//     else {
+//         console.log(" this input is not acceptable");
+//         callback1();
+
+//     } 
+// }
+
+function validateId (input , callback1, callback2){
+    var options = [];
     // if the input is either q or Q   
     if ((input).toLowerCase() === "q"){
         exit();
@@ -127,45 +174,59 @@ function validate(input, category , callback1 , callback2){
     else if (!isNaN(input)){
         // console.log(" the ID you entered is  a number");
         //check if the number user entered exists in the list of item options  
-            var querySrt = "SELECT " + variable + " FROM products" ;
-            connection.query(querySrt , function(err, data){
-                if (err) throw err;
-                console.log (querySrt);
-                // console.log(data);
-                for(var i = 0; i < data.length ; i++){
-                    options.push(parseInt(data[i][variable]));
-                }
-                // console.log(options);
-                // console.log(input);
-                if(category === "item_id"){
-                    if(options.includes(parseInt(input))) {
-                        console.log("inside true");
-                        callback2();        
-                    } else{
-                        console.log("inside false");                    
-                        callback1();
-                    } 
-                } else {
-                    if(parseInt(input) > 0 ) {
-                        console.log("this value is more than what we have in stock ");
-                        callback2();
-                    } else{
-                        console.log("great! we have this amount in our stock");
-                        callback1();
-                    }
-                }
-                
-            });    
-
+        var querySrt = "SELECT  item_id FROM products" ;
+        connection.query(querySrt , function(err, data){
+            if (err) throw err;
+            console.log (querySrt);
+            // console.log(data);
+            for(var i = 0; i < data.length ; i++){
+                options.push(parseInt(data[i].item_id));
+            }
+            if(options.includes(parseInt(input))) {
+                console.log("inside true");
+                callback2();        
+            } else{
+                console.log("inside false");                    
+                callback1();
+            }
+        });
     } // if the input is any other than Q or a number  
     else {
         console.log(" this input is not acceptable");
         callback1();
 
-    } 
+    }
 }
 
-
+function validateQuantity (id , input , callback1 , callback2){
+    // if the input is either q or Q   
+    if ((input).toLowerCase() === "q"){
+        exit();
+    }//check if the id is a number 
+    else if (!isNaN(input)){
+        // console.log(" the ID you entered is  a number");
+        //check if the number user entered exists in the list of item options  
+        console.log("id " + id)
+        var querySrt = "SELECT  stock_quantity FROM products WHERE ?" ;
+        connection.query(querySrt , 
+            {
+                item_id : id
+            }, 
+            function(err, data){
+                if (err) throw err;
+                console.log(data);
+                if (parseInt(input) > parseInt(data.stock_quantity)) {
+                    console.log("this value is more than what we have in stock ");
+                    callback1(id);
+                } else{
+                    console.log("great! we have this amount in our stock");
+                    var newQuantity = parseInt(data.stock_quantity) - parseInt(input);
+                    
+                    callback2(id,newQuantity); 
+                }
+        });
+    }
+}
 
 
 
