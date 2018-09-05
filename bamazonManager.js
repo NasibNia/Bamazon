@@ -75,7 +75,7 @@ function manageProducts() {
             
             //Update
             case "Add to Inventory":
-                addToInventory();
+                getItem(addToInventory);
                 break;
 
             //add 
@@ -105,8 +105,37 @@ function viewLowInvetory(){
     });
 }
 
-function addToInventory(){
-    
+function addToInventory(list){
+    var itemList = list;
+    inquirer.prompt([{
+        type: "list",
+        name: "itemName",
+        message: "\nWhich inventory you would like to add to?\n",
+        choices : itemList
+    },{
+        type : "input",
+        name: "newInv",
+        message: "\nEnter the new value of inventory?\n",
+
+    }
+    ]).then(function(response){
+        // var newValue = response.listOfItems[4]+ response.newInv;
+        var queryString = "UPDATE products SET ? WHERE ?";
+        connection.query(queryString,[
+            {   
+                stock_quantity : response.newInv
+                
+            },
+            {
+                product_name : response.itemName
+            }
+        ], 
+        function(err, res) {
+            console.log("Here is an updated list of the inventories:");
+            review(queryStr) ;  
+        }
+    );
+    });
     
 }
 
@@ -192,11 +221,17 @@ function getDepartments(crud){
     });
 }
 
-function getitem(crud){
+function getItem(crud){
     var itemList = [];
     connection.query("SELECT  * from products", function(err, data){
         for (var i = 0 ; i < data.length ; i++){
-            itemList.push(data[i]);
+            itemList.push(data[i].product_name);
+            
+            // itemList[i].push(data[i].item_id);
+            // itemList[i].push(data[i].product_name);
+            // itemList[i].push(data[i].department_name);
+            // itemList[i].push(data[i].price);
+            // itemList[i].push(data[i].stock_quantity);
         }
 
     crud(itemList);
