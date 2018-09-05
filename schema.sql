@@ -4,7 +4,7 @@ CREATE DATABASE bamazon;
 
 USE bamazon;
 
-CREATE TABLE products(
+CREATE TABLE  products(
     item_id INTEGER(11) AUTO_INCREMENT NOT NULL,
     product_name VARCHAR(50),
     department_name VARCHAR(50),
@@ -45,4 +45,43 @@ VALUES ("organic cashes" , "food" , 21.99 , 896);
 
 
 
+CREATE TABLE sales(
+    item_id INTEGER(11) AUTO_INCREMENT NOT NULL,
+    
+    product_sales INTEGER(50),
+    
+    PRIMARY KEY(item_id)
+);
+
+INSERT INTO sales(product_sales)
+VALUES (100);
+
+INSERT INTO sales(product_sales)
+VALUES (200);
+
+INSERT INTO sales(product_sales)
+VALUES (70);
+
+INSERT INTO sales(product_sales)
+VALUES (300);
+
+INSERT INTO sales(product_sales)
+VALUES (512);
+
+INSERT INTO sales(product_sales)
+VALUES (25);
+
+INSERT INTO sales(product_sales)
+VALUES (1000);
+
+INSERT INTO sales(product_sales)
+VALUES (600);
+
+INSERT INTO sales(product_sales)
+VALUES (20);
+
+INSERT INTO sales(product_sales)
+VALUES (700);
+
 SELECT * FROM products;
+SELECT * FROM sales;
