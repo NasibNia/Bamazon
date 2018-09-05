@@ -107,19 +107,16 @@ function viewLowInvetory(){
 
 function addToInventory(){
     
+    
 }
 
 function addNew(list){
     var currentDepList = list;
+    currentDepList.push("other");
     inquirer.prompt([{
         type: "input",
         name: "productName",
         message: "\nWhat is the name of the product you would like to add\n"
-    }, {
-        type:"list",
-        name: "depName",
-        message: "Which department does this product fall into\n",
-        choices: ["electronin","pet supplies", "sports", "supplements", "food", "books","other"]
     }, {
         type: "input",
         name: "cost",
@@ -129,48 +126,80 @@ function addNew(list){
         name: "quantity",
         message: "How many do we have? \n"
 
+    }, {
+        type:"list",
+        name: "depName",
+        message: "Which department does this product fall into\n",
+        choices: currentDepList
     }]).then(function(answers){
         var department = answers.depName;
-        if(answers.depName === "other"){
+        if(department === "other"){
             inquirer.prompt([
                 {
                     type : "input",
                     name : "newDep",
-                    message: "what is the new department"
+                    message: "what is this 'OTHER' department?"
                 }]).then(function(OtherRes){
+                    // console.log("currentDepList "  + currentDepList);
+                    // console.log("OtherRes.newDep " + OtherRes.newDep);
+                    // console.log(currentDepList.includes((OtherRes.newDep).toLowerCase()));
                     if(currentDepList.includes((OtherRes.newDep).toLowerCase())){
-                        console.log("This department already exists");
-                        getDepartments(addNew);
-                    } else {
-                        department = OtherRes.newDep;
-                    }
+                        console.log("Department already exists");
+                    } 
+                    department = (OtherRes.newDep).toLowerCase();
+                    
+                    var queryString = "INSERT INTO products SET ?";
+                    connection.query(queryString, {
+                        product_name   : answers.productName,
+                        department_name: department,
+                        price          : parseFloat(answers.cost).toFixed(4), 
+                        stock_quantity : parseInt(answers.quantity)
+                    });
+                    queryString = "INSERT INTO sales SET ?";
+                    connection.query(queryString, {
+                        product_sales   : 0
+                    });
+                    console.log("Product added!");
+                    review(queryStr);
+                    });
+        } else {
+            var queryString = "INSERT INTO products SET ?";
+            connection.query(queryString, {
+                product_name   : answers.productName,
+                department_name: department,
+                price          : parseFloat(answers.cost).toFixed(4), 
+                stock_quantity : parseInt(answers.quantity)
             });
-        } 
-        var queryString = "INSERT INTO products SET ?";
-        connection.query(queryString, {
-            product_name   : answers.productName,
-            department_name: department,
-            price          : parseFloat(answers.cost).toFixed(4), 
-            stock_quantity : parseInt(answers.quantity)
-        });
-        queryString = "INSERT INTO sales SET ?";
-        connection.query(queryString, {
-            product_sales   : 0
-        });
-        review(queryStr);
-        
+            queryString = "INSERT INTO sales SET ?";
+            connection.query(queryString, {
+                product_sales   : 0
+            });
+            console.log("Product added!");
+            review(queryStr);
+        }    
     });
 }
 
 function getDepartments(crud){
     var depList = [];
 
-    connection.query("SELECT department_name from products", function(err, data){
+    connection.query("SELECT DISTINCT department_name from products", function(err, data){
         for (var i = 0 ; i < data.length ; i++){
             depList.push(data[i].department_name);
         }
 
     crud(depList);
+    });
+}
+
+function getitem(crud){
+    var itemList = [];
+    connection.query("SELECT  * from products", function(err, data){
+        for (var i = 0 ; i < data.length ; i++){
+            itemList.push(data[i]);
+        }
+
+    crud(itemList);
     });
 }
 
