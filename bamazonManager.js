@@ -46,7 +46,7 @@ function review (str){
         console.log(table.toString());
 
         restart();
-        // manageProduct();
+
     });
 }
 
@@ -107,19 +107,19 @@ function addToInventory(list,quants){
     var itemList = list;
     // console.log(quants);
     inquirer.prompt([{
-        type: "list",
+        type: "input",
         name: "itemName",
-        message: "\nWhich inventory you would like to add to?\n",
-        choices : itemList
+        message: "\nWhat is the id of the inventory you would like to add to?\n",
+        // choices : itemList
     },{
         type : "input",
         name: "newInv",
-        message: "\nEnter the new value of inventory?\n",
+        message: "\nHow many would you like to add to this inventory?\n",
 
     }
     ]).then(function(response){
         // var newValue = response.listOfItems[4]+ response.newInv;
-        var quantsNow = quants[itemList.indexOf(response.itemName)];
+        var quantsNow = quants[itemList.indexOf(parseInt(response.itemName))];
         var quantsNew = quantsNow + parseInt(response.newInv);
         var queryString = "UPDATE products SET ? WHERE ?";
         connection.query(queryString,[
@@ -128,12 +128,13 @@ function addToInventory(list,quants){
                 
             },
             {
-                product_name : response.itemName
+                item_id : parseInt(response.itemName)
             }
         ], 
         function(err, res) {
             console.log("Here is an updated list of the inventories:");
-            review(queryStr) ;  
+            review(queryStr) ;
+            console.log ("summary of last action")  
         }
     );
     });
@@ -223,15 +224,14 @@ function getItem(crud){
     var quant =[];
     connection.query("SELECT  * from products", function(err, data){
         for (var i = 0 ; i < data.length ; i++){
-            itemList.push(data[i].product_name);
+            // itemList.push(data[i].product_name);
             
-            // itemList[i].push(data[i].item_id);
+            itemList.push(data[i].item_id);
             // itemList[i].push(data[i].product_name);
             // itemList[i].push(data[i].department_name);
             // itemList[i].push(data[i].price);
             quant.push(data[i].stock_quantity);
         }
-
     crud(itemList, quant);
     });
 }
