@@ -3,6 +3,7 @@ var inquirer = require ("inquirer");
 var Table = require('cli-table');
 var queryStr;
 var lowLimit = 300;
+var message; 
 
 var connection = mysql.createConnection({
     host : "localhost",
@@ -23,11 +24,12 @@ connection.connect(function(err){
 
 function initialize(){
     queryStr = "SELECT item_id, product_name , product_sales, department_name , price , stock_quantity FROM products";
-    review(queryStr);
+    message = null;
+    review(queryStr , message);
 }
 
 // this function displays the most updated inventory on the console.
-function review (str){
+function review (str , txt){
 
     var table = new Table({
         head: ['ID', 'NAME', 'SALES' , 'DEPARTMENT', 'PRICE', 'IN STOCK']
@@ -44,9 +46,8 @@ function review (str){
         }
         console.log("\n");
         console.log(table.toString());
-
+        summary(txt);
         restart();
-
     });
 }
 
@@ -63,7 +64,7 @@ function manageProducts() {
         switch (answer.userOptions) {
             //VIEW
             case "View Products for Sale":    
-                review(queryStr);
+                review(queryStr , "You Viewed Products for Sale\nPress Yes if wish to do more");
                 break;
             
             //VIEW
@@ -99,7 +100,8 @@ function viewLowInvetory(){
         }
     ]).then(function(response){
         lowLimit = response.userInputLimit;
-        review(queryStr + " WHERE products.stock_quantity < " + lowLimit);
+        message = "You Rreviewed the Low Inventory";
+        review(queryStr + " WHERE products.stock_quantity < " + lowLimit , message);
     });
 }
 
@@ -133,8 +135,8 @@ function addToInventory(list,quants){
         ], 
         function(err, res) {
             console.log("Here is an updated list of the inventories:");
-            review(queryStr) ;
-            console.log ("summary of last action")  
+            message = "You added " + response.newInv + "to the item with the id " + response.itemName ; 
+            review(queryStr , message) ; 
         }
     );
     });
@@ -183,13 +185,18 @@ function addNew(list){
                     connection.query(queryString, {
                         product_name   : answers.productName,
                         department_name: department,
-                        price          : parseFloat(answers.cost).toFixed(4), 
+                        price          : parseFloat(answers.cost).toFixed(2), 
                         stock_quantity : parseInt(answers.quantity),
                         product_sales   : 0
                     });
                     
-                    console.log("Product added!");
-                    review(queryStr);
+                    // console.log("Product added!");
+                    message = "You added a new product to department " + department +  "\n";
+                    message += "Product Name     : "+ answers.productName + "\n";
+                    message += "Quantities added : "+ parseInt(answers.quantity) + "\n";
+                    message += "Selling Price    : "+ parseFloat(answers.cost).toFixed(2), + "\n";
+
+                    review(queryStr , message);
                     });
         } else {
             var queryString = "INSERT INTO products SET ?";
@@ -201,8 +208,13 @@ function addNew(list){
                 product_sales   : 0
             });
             
-            console.log("Product added!");
-            review(queryStr);
+            // console.log("Product added!");
+            message = "You added a new product to department " + department +  "\n";
+            message += "Product Name     : "+ answers.productName + "\n";
+            message += "Quantities added : "+ parseInt(answers.quantity) + "\n";
+            message += "Selling Price    : "+ parseFloat(answers.cost).toFixed(2), + "\n";
+
+            review(queryStr , message);
         }    
     });
 }
@@ -260,4 +272,20 @@ function exit(){
     console.log("Thanks for using my code to manage your inventory. Goodbye for now!");
     //This will exit out of our command line process
     connection.end();
+}
+
+function summary(st){
+    console.log(st);
+    if (st !== null){
+        var table2 = new Table({
+            head: ['SUMMARY']
+          , colWidths: [50],
+          chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' ,             'top-right': '╗', 'bottom': '═' , 'bottom-mid': '╧' ,             'bottom-left': '╚' , 'bottom-right': '╝', 'left': '║' ,           'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
+             , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
+        });
+        table2.push([st]);
+        console.log("\n");
+        console.log(table2.toString());
+    }
+    
 }
