@@ -22,8 +22,8 @@ connection.connect(function(err){
 // this function displays the most updated inventory on the console.
 function review (){
     var table = new Table({
-        head: ['ID', 'NAME', 'DEPARTMENT', 'PRICE', 'STOCK']
-      , colWidths: [5, 30, 30, 10, 10],
+        head: ['ID', 'PRODUCT NAME', 'DEPARTMENT NAME', 'UNIT PRICE', 'IN STOCK QUANTITY', 'PRODUCT SALES' ]
+      , colWidths: [5, 30, 30, 30, 30, 30],
       chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' ,             'top-right': '╗', 'bottom': '═' , 'bottom-mid': '╧' ,             'bottom-left': '╚' , 'bottom-right': '╝', 'left': '║' ,           'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
          , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
     });
@@ -32,7 +32,7 @@ function review (){
         if (err) throw err;
         for (var i=0 ; i < data.length ; i++){
             table.push(
-                [data[i].item_id , data[i].product_name, data[i].department_name, data[i].price,  data[i].stock_quantity]
+                [data[i].item_id , data[i].product_name, data[i].department_name, data[i].price,  data[i].stock_quantity, data[i].product_sales]
             );
         }
         console.log("\n");
@@ -72,11 +72,12 @@ function takeOrder (id){
     });
 }
 
-function updateProducts(id , numbers) {
+function updateProducts(id , numbers, updatedSales) {
     var queryString = "UPDATE products SET ? WHERE ?";
     connection.query(queryString,[
         {
-             stock_quantity : numbers
+             stock_quantity : numbers,
+             product_sales  : updatedSales
         },
         {
             item_id : id
@@ -101,16 +102,16 @@ function validateId (input , callback1, callback2){
         var querySrt = "SELECT  item_id FROM products" ;
         connection.query(querySrt , function(err, data){
             if (err) throw err;
-            console.log (querySrt);
+            // console.log (querySrt);
             // console.log(data);
             for(var i = 0; i < data.length ; i++){
                 options.push(parseInt(data[i].item_id));
             }
             if(options.includes(parseInt(input))) {
-                console.log("inside true");
+                // console.log("inside true");
                 callback2(parseInt(input));        
             } else{
-                console.log("inside false");                    
+                // console.log("inside false");                    
                 callback1();
             }
         });
@@ -130,7 +131,7 @@ function validateQuantity (id , input , callback1 , callback2){
     else if (!isNaN(input)){
         // console.log(" the ID you entered is  a number");
         //check if the number user entered exists in the list of item options  
-        console.log("id " + id);
+        // console.log("id " + id);
         var querySrt = "SELECT  * FROM products WHERE ?" ;
         connection.query(querySrt , 
             {
@@ -150,8 +151,9 @@ function validateQuantity (id , input , callback1 , callback2){
                     console.log("great! we have this amount in our stock");
                     
                     var newQuantity = stock-request;
+                    var newsales  = parseFloat(data[0].price) * request + parseFloat(data[0].product_sales);
                     // console.log ("new is" + newQuantity);
-                    callback2(parseInt(id),newQuantity); 
+                    callback2(parseInt(id),newQuantity , newsales); 
                 }
         });
     }

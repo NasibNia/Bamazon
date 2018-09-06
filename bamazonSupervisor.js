@@ -22,7 +22,8 @@ connection.connect(function(err){
 });
 
 function initialize(){
-    queryStr = "SELECT item_id, product_name , product_sales, department_name , price , stock_quantity FROM products";
+    queryStr = "SELECT products.item_id, products.product_name , sales.product_sales, products.department_name , products.price , products.stock_quantity ";
+    queryStr += "FROM sales INNER JOIN products ON (products.item_id = sales.item_id)";
     review(queryStr);
 }
 
@@ -35,6 +36,7 @@ function review (str){
       chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' ,             'top-right': '╗', 'bottom': '═' , 'bottom-mid': '╧' ,             'bottom-left': '╚' , 'bottom-right': '╝', 'left': '║' ,           'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
          , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
     });
+    
     connection.query(str, function(err, data){
         if (err) throw err;
         for (var i=0 ; i < data.length ; i++){
@@ -103,9 +105,8 @@ function viewLowInvetory(){
     });
 }
 
-function addToInventory(list,quants){
+function addToInventory(list){
     var itemList = list;
-    // console.log(quants);
     inquirer.prompt([{
         type: "list",
         name: "itemName",
@@ -119,12 +120,10 @@ function addToInventory(list,quants){
     }
     ]).then(function(response){
         // var newValue = response.listOfItems[4]+ response.newInv;
-        var quantsNow = quants[itemList.indexOf(response.itemName)];
-        var quantsNew = quantsNow + parseInt(response.newInv);
         var queryString = "UPDATE products SET ? WHERE ?";
         connection.query(queryString,[
             {   
-                stock_quantity : quantsNew
+                stock_quantity : response.newInv
                 
             },
             {
@@ -183,10 +182,12 @@ function addNew(list){
                         product_name   : answers.productName,
                         department_name: department,
                         price          : parseFloat(answers.cost).toFixed(4), 
-                        stock_quantity : parseInt(answers.quantity),
+                        stock_quantity : parseInt(answers.quantity)
+                    });
+                    queryString = "INSERT INTO sales SET ?";
+                    connection.query(queryString, {
                         product_sales   : 0
                     });
-                    
                     console.log("Product added!");
                     review(queryStr);
                     });
@@ -196,10 +197,12 @@ function addNew(list){
                 product_name   : answers.productName,
                 department_name: department,
                 price          : parseFloat(answers.cost).toFixed(4), 
-                stock_quantity : parseInt(answers.quantity),
+                stock_quantity : parseInt(answers.quantity)
+            });
+            queryString = "INSERT INTO sales SET ?";
+            connection.query(queryString, {
                 product_sales   : 0
             });
-            
             console.log("Product added!");
             review(queryStr);
         }    
@@ -220,7 +223,6 @@ function getDepartments(crud){
 
 function getItem(crud){
     var itemList = [];
-    var quant =[];
     connection.query("SELECT  * from products", function(err, data){
         for (var i = 0 ; i < data.length ; i++){
             itemList.push(data[i].product_name);
@@ -229,10 +231,10 @@ function getItem(crud){
             // itemList[i].push(data[i].product_name);
             // itemList[i].push(data[i].department_name);
             // itemList[i].push(data[i].price);
-            quant.push(data[i].stock_quantity);
+            // itemList[i].push(data[i].stock_quantity);
         }
 
-    crud(itemList, quant);
+    crud(itemList);
     });
 }
 
@@ -256,8 +258,9 @@ function restart() {
 }
 
 // this function ends the connection to database
-function exit(){
+function exit (){
     console.log("Thanks for using my code to manage your inventory. Goodbye for now!");
     //This will exit out of our command line process
     connection.end();
+
 }
