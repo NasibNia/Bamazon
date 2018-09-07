@@ -14,8 +14,8 @@ This fun project is my second project in the beautiful land of node.js, the powe
 # Images
 <!-- take a picture of the image and add it into the readme  -->
 <!-- ![image title](path or link to image) -->
-![bot](bot.jpg)
-![costumer](pic1.png)
+
+![costumer](images/pic1.png)
 
 
 ## Where to start?
@@ -78,7 +78,7 @@ The table would be provided for the customer review, followed by this question:
 There are more to the logic which is shown in a nutshell as following flowchart
 
 
-![costumer](FlowChart.jpg)
+![costumer](images/FlowChart.jpg)
 
 
 <!-- ![costumer](costumer.gif) -->
