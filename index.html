@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Star Wars - Express</title>
+  <!-- Latest compiled and minified CSS & JS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+    <button class="btn btn-danger btn-lg">Click Me</button>
+    <!-- <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6"> -->
+                <div class="flowchart"><img src="images/FlowChart.jpg" alt="shopImage"></div>
+            <!-- </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div> -->
+
+    <script>
+        $(document).ready(function (){ 
+            
+            $('.flowchart').hide();
+            var chart = false;
+            $('.btn').on('click', function(){
+                if (chart){
+                    $('.flowchart').hide();
+                    chart = false;
+                } else {
+                    $('.flowchart').show();
+                    chart = true;
+                }
+            });
+        });
+        
+    </script>
+
+</body>
+</html>

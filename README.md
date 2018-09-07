@@ -6,6 +6,17 @@
 
 
 This fun project is my second project in the beautiful land of node.js, the powerful package that enables us to run javascript outside of browsers. The app is called "YORSTORE" and serves both ends of a ratil store ; "the costumer" and the "store managers", providing different features to meet their specific needs. 
+# Link to deployed site
+<!-- make a link to the deployed site --> 
+<!-- [What the user will see](the link to the deployed site) -->
+[YORSTOR](https://nasibnia.github.io/Bamazon/.)
+
+# Images
+<!-- take a picture of the image and add it into the readme  -->
+<!-- ![image title](path or link to image) -->
+![bot](bot.jpg)
+![costumer](pic1.png)
+
 
 ## Where to start?
 
@@ -32,6 +43,7 @@ On the costumer side; YORSTORE provides the following features:
 - Updating the inventory after each purchace and providing the details to the customer
 - Option to quit the shopping experience at any time!
 
+
 ## More details from the backend:
 
 The customer side interface provide a table with the most recent data trakced in real time. the table has the following colomns:
@@ -46,63 +58,31 @@ The customer side interface provide a table with the most recent data trakced in
 
 The table would be provided for the customer review, followed by this question:
 
-![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `what is the ID of the item you would like to purchase [Quit with Q]`
+![#1589F0](https://placehold.it/15/f03c15/000000?text=+) `what is the ID of the item you would like to purchase [Quit with Q]`
 
 - typing q/Q (The validation setting in the code is so that input is case insensititve) will prints the following on the console, ending the purchace experience:
 
-- ![#c5f015](https://placehold.it/15/c5f015/000000?text=+) ` How many would you like? [Quit with Q]`
+- ![#1589F0](https://placehold.it/15/c5f015/000000?text=+) ` How many would you like? [Quit with Q]`
+    - If the number is bigger than current stock quantity; the customer will be warned and asked to enter a valid number. The purchase doesn't go through until then.
+
+    ![#f03c15](https://placehold.it/15/1589F0/000000?text=+) `this value is more than what we have in stock` 
+    ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)`? How many would you like? [Quit with Q]`
+
+    - Otherwise, the purchase gets complited, and customer sees the following update :
+    ![#c5f015](https://placehold.it/15/1589F0/000000?text=+)`GREAT! your purchase completed, Here is an updated list of products:`
+
+    and the following will be executed in the table right away
+        - Purchased units will be deducted from the stock quantity. 
+        - Product sales will be increased by (the number of sold units * unit price)
+
+There are more to the logic which is shown in a nutshell as following flowchart
 
 
+![costumer](FlowChart.jpg)
 
 
+<!-- ![costumer](costumer.gif) -->
 
-![costumer](costumer.gif)
-
-
-
-
-
-
-The application has capability of searching songs through spotify API, movies through OMDB API, and concerts through Bandsintown API. There are couple of modules that are required for the app to function properly. All of these dependecies are listed at the begining of the code using the keyword 'require' and  would need to be installed if are not provided under the name "node_modules"
-
-To ask Liri for a specific task, user would need to provide the right command in the terminal. 
-
-For instance, proper command for searching a song named "nothing else matters" would be:
-"node Liri.js spotify-this-song nothing else matters"
-
-proper command for searching a movie named "mean girls" would be:
-"node Liri.js movie-this mean girls"
-
-proper command for searching a concert from "katy perry" would be:
-"node Liri.js concert-this katy perry"
-
-Also, there is another command as "node Liri.js do-as-it-says " that goes through the text file "random.txt" and takes its content as "action" and "search item".
-
-Liri would take the search name and will send the search name to the appropriate searchh channel, depending on the requested action. If the provided name includes more than one word, the code concatenates them into a api-searchable  format.
-
-There are defaults provided for "spotify-this-song" and "movie-this" in case that only the action is provided and not the search name.
-
-Finally it will get back to the user by providing the results search the console.
-
-Also, in this project I used "inquirer" to interact with user through promp method. This package is used to provide user a list of acceptable actions in cases that no right input is provided.
-
-I also used fs package (file system) to read text file (random.txt when the action "do-what-it-says" is asked by user).
-I also created a text file named log.txt that will be updated through fs.append method. This text file will keep a record of any command that is typed to the console.log.
-
-Other packages that are used in this project include "moment.js" to print out the concert date to a specific format, "request" to grab data from the OMDB API and the Bands In Town API , "dotEnv" to load environment variables from a .env file into process.env, and " Node Spotify API " which is a simple to use API library for the Spotify REST API. 
-
-# Link to deployed site
-<!-- make a link to the deployed site --> 
-<!-- [What the user will see](the link to the deployed site) -->
-
-
-This program is not deployed and is run on the console.
-
-
-# Images
-<!-- take a picture of the image and add it into the readme  -->
-<!-- ![image title](path or link to image) -->
-![bot](bot.jpg)
 
 
 
@@ -120,18 +100,14 @@ This program is not deployed and is run on the console.
 -->
 - javascript
 - node.js
-- API calls
+- mySQL
 - promise functions
 - call backs
 - error handling
-- moment.js
-- node dotEnv
-- node request
-- Node Spotify API
-- fs (file system)
 - inquirer (.prompt)
 - npm
 - node modulus
+
 
 
 
@@ -192,18 +168,12 @@ function getInput (){
 <!-- Learning points where you would write what you thought was helpful -->
 - javascript
 - node.js
-- API calls
+- mySQL
 - promise functions
 - call backs
 - error handling
-- moment.js
-- node dotEnv
-- node request
-- Node Spotify API
-- working with fs (file system)
-- working with inquirer (.prompt)
-- npm init -y
-- npm install
+- inquirer (.prompt)
+- npm
 - node modulus
 
 

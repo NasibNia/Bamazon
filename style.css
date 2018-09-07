@@ -1,0 +1,22 @@
+body, html{
+    background: url("images/pic1.png");
+    background-position: center;
+    /* background-repeat: no-repeat;  */
+    /* background-size: cover; */
+    height:100%;
+    font-family: 'Hanalei Fill', cursive;
+	font-size: 20px;
+    font-style: bold;
+    position: relative;
+}
+
+.btn{
+    position: fixed;
+    bottom: 45%;
+    left: 2%
+
+}
+.flowchart{
+    margin-left: 15%;
+    margin-right: 15%
+}

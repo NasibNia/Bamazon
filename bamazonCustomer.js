@@ -83,7 +83,7 @@ function updateProducts(id , numbers, updatedSales) {
             item_id : id
         }] , function(err, data){
         if (err) throw err;
-        console.log("great! your purchase completed, Here is an updated list of products:");
+        console.log("Wonderful! your purchase completed, Here is an updated list of products:");
         //Let's have a look at our updated table (pulling straight from our database!!!!)
         review() ;
     });
@@ -117,7 +117,7 @@ function validateId (input , callback1, callback2){
         });
     } // if the input is any other than Q or a number  
     else {
-        console.log(" this input is not acceptable");
+        console.log(" This Input Is Not Acceptable, Please Try Again!");
         callback1();
 
     }
@@ -139,16 +139,16 @@ function validateQuantity (id , input , callback1 , callback2){
             }, 
             function(err, data){
                 if (err) throw err;
-                console.log(data);
+                // console.log(data);
                 var stock = parseInt(data[0].stock_quantity);
                 var request = parseInt(input);
                 // console.log("stock " + stock);
                 // console.log("request "+ request);
                 if (request > stock) {
-                    console.log("this value is more than what we have in stock ");
+                    console.log("Sorry! This value is more than what we have in stock; Please Try again! ");
                     callback1(id);
                 } else{
-                    console.log("great! we have this amount in our stock");
+                    console.log("YAYYYY! we have the number you ordered in our stock");
                     
                     var newQuantity = stock-request;
                     var newsales  = parseFloat(data[0].price) * request + parseFloat(data[0].product_sales);
