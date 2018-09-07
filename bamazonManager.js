@@ -24,7 +24,7 @@ connection.connect(function(err){
 
 function initialize(){
     queryStr = "SELECT item_id, product_name , product_sales, department_name , price , stock_quantity FROM products";
-    message = null;
+    message = "Thanks for vising our page!";
     review(queryStr , message);
 }
 
@@ -100,17 +100,17 @@ function viewLowInvetory(){
         }
     ]).then(function(response){
         lowLimit = response.userInputLimit;
-        message = "You Rreviewed the Low Inventory";
+        message = "You Rreviewed Inventory(s) lower than "+ lowLimit+ "\n'Add to Inventory' if there are items that you are running out of";
         review(queryStr + " WHERE products.stock_quantity < " + lowLimit , message);
     });
 }
 
-function addToInventory(list,quants){
+function addToInventory(list,quants,pName,pDepart){
     var itemList = list;
-    // console.log(quants);
+    console.log(pName);
     inquirer.prompt([{
         type: "input",
-        name: "itemName",
+        name: "itemId",
         message: "\nWhat is the id of the inventory you would like to add to?\n",
         // choices : itemList
     },{
@@ -121,8 +121,10 @@ function addToInventory(list,quants){
     }
     ]).then(function(response){
         // var newValue = response.listOfItems[4]+ response.newInv;
-        var quantsNow = quants[itemList.indexOf(parseInt(response.itemName))];
+        var quantsNow = quants[itemList.indexOf(parseInt(response.itemId))];
         var quantsNew = quantsNow + parseInt(response.newInv);
+        var prdctName = pName[itemList.indexOf(parseInt(response.itemId))];
+        var prdctDep  = pDepart[itemList.indexOf(parseInt(response.itemId))];
         var queryString = "UPDATE products SET ? WHERE ?";
         connection.query(queryString,[
             {   
@@ -130,12 +132,17 @@ function addToInventory(list,quants){
                 
             },
             {
-                item_id : parseInt(response.itemName)
+                item_id : parseInt(response.itemId)
             }
         ], 
         function(err, res) {
-            console.log("Here is an updated list of the inventories:");
-            message = "You added " + response.newInv + "to the item with the id " + response.itemName ; 
+            console.log("Here is an updated list of the following inventory:");
+            message = "You added  '" + response.newInv + "' units to the following item\n" + 
+            "Id                :    " + response.itemId + "\n"+
+            "Name              :    " + prdctName + "\n" +
+            "Department        :    " + prdctDep + "\n" +
+            "Previous quantity :    " + quantsNow + "\n" +
+            "Current  quantity :    " + quantsNew + "\n" ; 
             review(queryStr , message) ; 
         }
     );
@@ -234,17 +241,19 @@ function getDepartments(crud){
 function getItem(crud){
     var itemList = [];
     var quant =[];
+    var name =[];
+    var depart = [];
     connection.query("SELECT  * from products", function(err, data){
         for (var i = 0 ; i < data.length ; i++){
             // itemList.push(data[i].product_name);
             
             itemList.push(data[i].item_id);
-            // itemList[i].push(data[i].product_name);
-            // itemList[i].push(data[i].department_name);
+            name.push(data[i].product_name);
+            depart.push(data[i].department_name);
             // itemList[i].push(data[i].price);
             quant.push(data[i].stock_quantity);
         }
-    crud(itemList, quant);
+    crud(itemList, quant,name,depart);
     });
 }
 
@@ -275,11 +284,10 @@ function exit(){
 }
 
 function summary(st){
-    console.log(st);
     if (st !== null){
         var table2 = new Table({
             head: ['SUMMARY']
-          , colWidths: [50],
+          , colWidths: [100],
           chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' ,             'top-right': '╗', 'bottom': '═' , 'bottom-mid': '╧' ,             'bottom-left': '╚' , 'bottom-right': '╝', 'left': '║' ,           'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
              , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
         });
