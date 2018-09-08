@@ -141,11 +141,107 @@ Yes, That's right. All this is possible thanks to SQL and MYSQL, to store, inter
 <!-- put snippets of code inside ``` ``` so it will look like code -->
 <!-- if you want to put blockquotes use a > -->
 
-
-
-```
+This block of code belongs to yorStor.js where the two pointers to the instances of Customer and Manager are imported. It also brings in the inquirer to interact with the user through terminal, and call the manager.manage() or customer.shop() function based on users response.
 
 ```
+var Customer = require ("./bamazonCustomer.js");
+var Manager = require ("./bamazonManager.js");
+var inquirer = require ("inquirer");
+
+function start(){
+    var customer = new Customer();
+    var manager  = new Manager();
+    inquirer.prompt([
+        {
+            type : "list",
+            message : "Welcome to your store; Please Select one to continue",
+            choices : [ "I am a customer!", "I am a Manager in this store!"],
+            name : "character"
+
+        }
+        ]).then(function(response){
+            switch (response.character){
+                case "I am a Manager in this store!":
+                    manager.manage();
+                    break;
+                case "I am a customer!":
+                    customer.shop();
+                    break;
+            }
+    });
+
+}
+```
+This part of the code belongs to bamazonCustomer.js and starts by defining the Customer constructor containing the connection pointer to the mysql.createConnection instance. This will create a connection to the bamazon database.
+Other methods are then added using the prototype. 
+
+The second block shows the shop method wherein the connection is actually made, and while we are inside the connection another function review is called that shows data in the terminal.
+
+The third block of the code shown in bellow is to validate the input item_id provided by customer and take appropriate actions based on the outcome of validation
+
+```
+var Customer = function(){
+    this.connection = mysql.createConnection({
+        host : "localhost",
+        port : "3306",
+    
+        user : "root",
+    
+        password : "******",
+        database : "bamazon"
+    });   
+}; 
+
+Customer.prototype.shop = function () {
+    this.connection.connect((err)=>{
+        if (err) throw err;
+        this.review();
+    });
+};
+
+
+Customer.prototype.validateId = function(input){
+    var options = [];
+    // if the input is either q or Q   
+    if ((input).toLowerCase() === "q"){
+        this.exit();
+    }//check if the id is a number 
+    else if (Number.isInteger(parseFloat(input))){
+
+        //check if the number user entered exists in the list of item options  
+        var querySrt = "SELECT  item_id FROM products" ;
+        this.connection.query(querySrt , (err, data) => {
+            if (err) throw err;
+            
+            for(var i = 0; i < data.length ; i++){
+                options.push(parseInt(data[i].item_id));
+            }
+            if(options.includes(parseInt(input))) {
+                this.takeOrder(parseInt(input));        
+            } else{
+                console.log(chalk.cyan.bold('**********************************************************\n')+
+                                chalk.bgYellow("               This value is not allowed                  \n")+
+                                chalk.bgYellow(" It is either negative or bigger than max ID in our table \n")+
+                                chalk.bgYellow("                   Please Try Again                       \n")+ 
+                            chalk.cyan.bold('**********************************************************'));
+                
+                this.manageProduct();
+            }
+        });
+    } // if the input is any other than Q or a number  
+    else {
+        console.log(chalk.cyan.bold('**********************************************************\n')+
+                        chalk.bgYellow("      This Input Is Not Acceptable, Please Try Again      \n")+ 
+                    chalk.cyan.bold('**********************************************************'));
+
+        this.manageProduct();
+
+    }
+};
+``` 
+
+
+
 
 
 # Learning points

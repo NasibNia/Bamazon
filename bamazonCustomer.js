@@ -19,10 +19,8 @@ var Customer = function(){
     
 };    
     Customer.prototype.shop = function () {
-        // console.log("yes!");
         this.connection.connect((err)=>{
             if (err) throw err;
-            // console.log(this);
             this.review();
         });
     };
@@ -76,8 +74,6 @@ var Customer = function(){
                 name : "quantity"
             }
         ]).then((response)=>{
-            // console.log("id " + id);
-            // console.log(this);
             this.validateQuantity(id , response.quantity);
     
         });
@@ -114,7 +110,6 @@ var Customer = function(){
         if ((input).toLowerCase() === "q"){
             this.exit();
         }//check if the id is a number 
-        // else if (!isNaN(input)){
         else if (Number.isInteger(parseFloat(input))){
 
             //check if the number user entered exists in the list of item options  
@@ -137,7 +132,6 @@ var Customer = function(){
                     this.manageProduct();
                 }
             });
-            // }
         } // if the input is any other than Q or a number  
         else {
             console.log(chalk.cyan.bold('**********************************************************\n')+
@@ -190,7 +184,6 @@ var Customer = function(){
                         var newQuantity = stock-request;
                         var charged = parseFloat(data[0].price) * request;
                         var newsales  = charged + parseFloat(data[0].product_sales);
-                        // console.log ("new is" + newQuantity);
                         this.updateProducts(parseInt(id),newQuantity , newsales , request, charged); 
                     } 
             });
