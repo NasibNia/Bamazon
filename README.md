@@ -75,15 +75,15 @@ The table would be provided for the customer review, followed by this question:
         - Purchased units will be deducted from the stock quantity. 
         - Product sales will be increased by (the number of sold units * unit price)
 
-There are more to the logic which is shown in a nutshell as following flowchart
 
-The governing logic behind the scene is as follows:
-![costumer](images/FlowChart.jpg)
-
-Also, the following clip shows how YORSTOR works on the customer side:
+The following clip shows how YORSTOR works on the customer side:
 It can be seen in the video, how YORSTOR validates the customer inputs and provide the appropriate follow up command afterwards;
 
 ![costumer](images/customer.gif)
+
+And here is the logic flowchart in a nutshell
+
+![costumer](images/FlowChart.jpg)
 
 ## What happens in the manager journey
 
