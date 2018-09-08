@@ -1,35 +1,43 @@
 var mysql = require ("mysql");
 var inquirer = require ("inquirer");
 var Table = require('cli-table');
+var chalk = require('chalk');
+
 var queryStr;
 var lowLimit = 300;
 var message; 
 
-var connection = mysql.createConnection({
-    host : "localhost",
-    port : "3306",
+var Manager = function (){
+    this.connection = mysql.createConnection({
+        host : "localhost",
+        port : "3306",
+    
+        user : "root",
+    
+        password : "password",
+        database : "bamazon"
+    });
+};
 
-    user : "root",
-
-    password : "password",
-    database : "bamazon"
-});
 
 
+Manager.prototype.manage = function(){
+    this.connection.connect((err)=>{
+        if (err) throw err;
+        this.initialize();
+    });
+};
 
-connection.connect(function(err){
-    if (err) throw err;
-    initialize();
-});
 
-function initialize(){
+
+Manager.prototype.initialize = function(){
     queryStr = "SELECT item_id, product_name , product_sales, department_name , price , stock_quantity FROM products";
     message = "Thanks for vising our page!";
-    review(queryStr , message);
-}
+    this.review(queryStr , message);
+};
 
 // this function displays the most updated inventory on the console.
-function review (str , txt){
+Manager.prototype.review  = function (str , txt){
 
     var table = new Table({
         head: ['ID', 'NAME', 'SALES' , 'DEPARTMENT', 'PRICE', 'IN STOCK']
@@ -37,7 +45,7 @@ function review (str , txt){
       chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' ,             'top-right': '╗', 'bottom': '═' , 'bottom-mid': '╧' ,             'bottom-left': '╚' , 'bottom-right': '╝', 'left': '║' ,           'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
          , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
     });
-    connection.query(str, function(err, data){
+    this.connection.query(str, (err, data)=>{
         if (err) throw err;
         for (var i=0 ; i < data.length ; i++){
             table.push(
@@ -45,13 +53,13 @@ function review (str , txt){
             );
         }
         console.log("\n");
-        console.log(table.toString());
-        summary(txt);
-        restart();
+        console.log(chalk.blue.bold(table.toString()));
+        this.summary(txt);
+        this.restart();
     });
-}
+};
 
-function manageProducts() {
+Manager.prototype.manageProducts = function() {
     
     inquirer.prompt([
         {
@@ -60,73 +68,70 @@ function manageProducts() {
             message: "What would you like to do",
             choices: ["View Products for Sale", "View Low Inventory" ,"Add to Inventory", "Add New Product", "Quit"]
         }
-    ]).then(function (answer) {
+    ]).then((answer)=>{
         switch (answer.userOptions) {
             //VIEW
             case "View Products for Sale":    
-                review(queryStr , "You Viewed Products for Sale\nPress Yes if wish to do more");
+                this.review(queryStr , "You Viewed Products for Sale\nPress Yes if wish to do more");
                 break;
             
             //VIEW
             case "View Low Inventory":
-                viewLowInvetory();    
+                this.viewLowInvetory();    
                 break;
             
             //Update
             case "Add to Inventory":
-                getItem(addToInventory);
+                this.getItem();
                 break;
 
             //add 
             case "Add New Product":
-                getDepartments(addNew);
+                this.getDepartments();
                 break;   
         
             //QUIT    
-            case "QUIT":
-                exit();
+            case "Quit":
+                this.exit();
                 break;
 
         }
     });
-}
+};
 
-function viewLowInvetory(){
+Manager.prototype.viewLowInvetory = function (){
     inquirer.prompt([
         {
             type : "input",
             message : "want to see the inventory less than ... (enter the value) ",
             name : "userInputLimit"
         }
-    ]).then(function(response){
+    ]).then((response)=>{
         lowLimit = response.userInputLimit;
         message = "You Rreviewed Inventory(s) lower than "+ lowLimit+ "\n'Add to Inventory' if there are items that you are running out of";
-        review(queryStr + " WHERE products.stock_quantity < " + lowLimit , message);
+        this.review(queryStr + " WHERE products.stock_quantity < " + lowLimit , message);
     });
-}
+};
 
-function addToInventory(list,quants,pName,pDepart){
+Manager.prototype.addToInventory = function (list,quants,pName,pDepart){
     var itemList = list;
-    console.log(pName);
     inquirer.prompt([{
         type: "input",
         name: "itemId",
         message: "\nWhat is the id of the inventory you would like to add to?\n",
-        // choices : itemList
     },{
         type : "input",
         name: "newInv",
         message: "\nHow many would you like to add to this inventory?\n",
 
     }
-    ]).then(function(response){
-        // var newValue = response.listOfItems[4]+ response.newInv;
+    ]).then((response)=>{
         var quantsNow = quants[itemList.indexOf(parseInt(response.itemId))];
         var quantsNew = quantsNow + parseInt(response.newInv);
         var prdctName = pName[itemList.indexOf(parseInt(response.itemId))];
         var prdctDep  = pDepart[itemList.indexOf(parseInt(response.itemId))];
         var queryString = "UPDATE products SET ? WHERE ?";
-        connection.query(queryString,[
+        this.connection.query(queryString,[
             {   
                 stock_quantity : quantsNew
                 
@@ -135,22 +140,24 @@ function addToInventory(list,quants,pName,pDepart){
                 item_id : parseInt(response.itemId)
             }
         ], 
-        function(err, res) {
-            console.log("Here is an updated list of the following inventory:");
+            (err, res)=> {
+            console.log(chalk.cyan('**********************************************************\n')+
+                      chalk.bgCyan("   Here is an updated list of the following inventory:    \n")+ 
+                        chalk.cyan('**********************************************************'));
             message = "You added  '" + response.newInv + "' units to the following item\n" + 
             "Id                :    " + response.itemId + "\n"+
             "Name              :    " + prdctName + "\n" +
             "Department        :    " + prdctDep + "\n" +
             "Previous quantity :    " + quantsNow + "\n" +
             "Current  quantity :    " + quantsNew + "\n" ; 
-            review(queryStr , message) ; 
+            this.review(queryStr , message) ; 
         }
     );
     });
     
-}
+};
 
-function addNew(list){
+Manager.prototype.addNew = function (list){
     var currentDepList = list;
     currentDepList.push("other");
     inquirer.prompt([{
@@ -171,7 +178,7 @@ function addNew(list){
         name: "depName",
         message: "Which department does this product fall into\n",
         choices: currentDepList
-    }]).then(function(answers){
+    }]).then((answers)=>{
         var department = answers.depName;
         if(department === "other"){
             inquirer.prompt([
@@ -179,17 +186,18 @@ function addNew(list){
                     type : "input",
                     name : "newDep",
                     message: "what is this 'OTHER' department?"
-                }]).then(function(OtherRes){
-                    // console.log("currentDepList "  + currentDepList);
-                    // console.log("OtherRes.newDep " + OtherRes.newDep);
-                    // console.log(currentDepList.includes((OtherRes.newDep).toLowerCase()));
+                }]).then((OtherRes)=>{
+                    
                     if(currentDepList.includes((OtherRes.newDep).toLowerCase())){
-                        console.log("Department already exists");
+                        console.log(chalk.yellow('***************************************************************\n')+
+                                 chalk.bgYellow("                This Department already exists!                \n")+
+                                 chalk.bgYellow("             Item will be added to the existing one            \n")+ 
+                                    chalk.yellow('***************************************************************'));
                     } 
                     department = (OtherRes.newDep).toLowerCase();
                     
                     var queryString = "INSERT INTO products SET ?";
-                    connection.query(queryString, {
+                    this.connection.query(queryString, {
                         product_name   : answers.productName,
                         department_name: department,
                         price          : parseFloat(answers.cost).toFixed(2), 
@@ -197,17 +205,16 @@ function addNew(list){
                         product_sales   : 0
                     });
                     
-                    // console.log("Product added!");
                     message = "You added a new product to department " + department +  "\n";
                     message += "Product Name     : "+ answers.productName + "\n";
                     message += "Quantities added : "+ parseInt(answers.quantity) + "\n";
                     message += "Selling Price    : "+ parseFloat(answers.cost).toFixed(2), + "\n";
 
-                    review(queryStr , message);
+                    this.review(queryStr , message);
                     });
         } else {
             var queryString = "INSERT INTO products SET ?";
-            connection.query(queryString, {
+            this.connection.query(queryString, {
                 product_name   : answers.productName,
                 department_name: department,
                 price          : parseFloat(answers.cost).toFixed(4), 
@@ -215,75 +222,76 @@ function addNew(list){
                 product_sales   : 0
             });
             
-            // console.log("Product added!");
             message = "You added a new product to department " + department +  "\n";
             message += "Product Name     : "+ answers.productName + "\n";
             message += "Quantities added : "+ parseInt(answers.quantity) + "\n";
             message += "Selling Price    : "+ parseFloat(answers.cost).toFixed(2), + "\n";
 
-            review(queryStr , message);
+            this.review(queryStr , message);
         }    
     });
-}
+};
 
-function getDepartments(crud){
+Manager.prototype.getDepartments = function (crud){
     var depList = [];
 
-    connection.query("SELECT DISTINCT department_name from products", function(err, data){
+    this.connection.query("SELECT DISTINCT department_name from products", (err, data)=>{
         for (var i = 0 ; i < data.length ; i++){
             depList.push(data[i].department_name);
         }
 
-    crud(depList);
+        this.addNew(depList);
     });
-}
+};
 
-function getItem(crud){
+Manager.prototype.getItem = function(){
     var itemList = [];
     var quant =[];
     var name =[];
     var depart = [];
-    connection.query("SELECT  * from products", function(err, data){
+    this.connection.query("SELECT  * from products", (err, data)=>{
         for (var i = 0 ; i < data.length ; i++){
-            // itemList.push(data[i].product_name);
             
             itemList.push(data[i].item_id);
             name.push(data[i].product_name);
             depart.push(data[i].department_name);
-            // itemList[i].push(data[i].price);
             quant.push(data[i].stock_quantity);
         }
-    crud(itemList, quant,name,depart);
+        this.addToInventory(itemList, quant,name,depart);
     });
-}
+};
 
 
-function restart() {
+Manager.prototype.restart = function() {
     inquirer.prompt([{
         type: "list",
         name: "continue",
         choices: ["Yes", "No"],
         message: "Would you like to do more?\n"
-    }]).then(function(answers) {
+    }]).then((answers)=> {
         //If we want to manage more Products, we'll rerun our initial prompt
         if (answers.continue === "Yes") {
-            manageProducts();
+            this.manageProducts();
             //Otherwise, we'll terminate the process
         } else {
-           exit();
+           this.exit();
         }
 
     });
-}
+};
 
 // this function ends the connection to database
-function exit(){
-    console.log("Thanks for using my code to manage your inventory. Goodbye for now!");
-    //This will exit out of our command line process
-    connection.end();
-}
+Manager.prototype.exit = function(){
+    console.log(chalk.green('***************************************************************\n')+
+              chalk.bgGreen("        Thanks for using this code to manage Your Store!       \n")+
+              chalk.bgGreen("                      Goodbye for now!                         \n")+ 
+                chalk.green('***************************************************************'));
 
-function summary(st){
+    //This will exit out of our command line process
+    this.connection.end();
+};
+
+Manager.prototype.summary= function(st){
     if (st !== null){
         var table2 = new Table({
             head: ['SUMMARY']
@@ -293,7 +301,9 @@ function summary(st){
         });
         table2.push([st]);
         console.log("\n");
-        console.log(table2.toString());
+        console.log(chalk.green(table2.toString()));
     }
     
-}
+};
+
+module.exports = Manager;

@@ -15,7 +15,7 @@ CREATE TABLE  products(
 );
 
 INSERT INTO products (product_name , department_name ,  price , stock_quantity , product_sales)
-VALUES ("echo plus" , "electronins" ,  99.99 , 920 , 999.9);
+VALUES ("echo plus" , "electronics" ,  99.99 , 920 , 999.9);
 
 INSERT INTO products(product_name ,  department_name ,  price , stock_quantity , product_sales)
 VALUES ("cat tree" , "pet supplies" , 69.99 , 1230 , 699.9);
@@ -27,7 +27,7 @@ INSERT INTO products(product_name , department_name ,  price , stock_quantity , 
 VALUES ("catit flower fountain" , "pet supplies" , 36.47 , 111 , 364.7);
 
 INSERT INTO products(product_name , department_name ,  price , stock_quantity , product_sales)
-VALUES ("Lenovo yoga book" ,"electronins" , 314.00 , 785, 3140);
+VALUES ("Lenovo yoga book" ,"electronics" , 314.00 , 785, 3140);
 
 INSERT INTO products(product_name , department_name ,  price , stock_quantity , product_sales)
 VALUES ("adidas shoes" , "sports ", 48.96 , 437 , 4896);
@@ -54,7 +54,7 @@ CREATE TABLE  departments(
 );
 
 INSERT INTO departments (department_id , department_name ,  over_head_costs)
-VALUES ("echo plus" , "electronins" ,  99.99 , 920);
+VALUES ("echo plus" , "electronics" ,  99.99 , 920);
 
 SELECT * FROM departments;
 

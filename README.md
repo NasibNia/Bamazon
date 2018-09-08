@@ -77,12 +77,38 @@ The table would be provided for the customer review, followed by this question:
 
 There are more to the logic which is shown in a nutshell as following flowchart
 
-
+The governing logic behind the scene is as follows:
 ![costumer](images/FlowChart.jpg)
 
+Also, the following clip shows how YORSTOR works on the customer side:
+It can be seen in the video, how YORSTOR validates the customer inputs and provide the appropriate follow up command afterwards;
 
-<!-- ![costumer](costumer.gif) -->
+![costumer](costumer.gif)
 
+## What happens in the manager journey
+
+Here is what happens in YORSTOR interface if the managers use it instead of customers;
+At this point, I have not put any validation key to prove the person who's entering the manager category is actually a manager. This validation is necessary to prevent any fraud or random people messing with the inventory data. This could by checking email or employee number validation. I will add this feature soon, but as of now, here is what happens in a nutshell:
+
+YORSTOR provides the following options to managers:
+
+- Viewing the list of invetories at real time
+- Viewing Low Inventory products
+    - it is possible to enter a number and see the inventories bellow that! This process could be repeated as many times that manager wants.
+- Add to Inventory 
+    - Similar to customer side there is a validation process for the input; table of contents will be updated as soon as the inventory is updated
+- Add New Product 
+    - To add a new product, manager should enter the name, quantities, price and the department for that product. A list of already existing departments will be provided for the ease of customer. Although an additional option of "others" is also provided. If this option is selected YORSTOR will requests to provide the name of that department; 
+        - if it is already among the existing ones; YORSTOR will warn the manager and list the product under the existing one,
+        - Otherwise, it creates a new department with the provided name and starting sold number of 0.
+- Quit the process at any point 
+
+The following clip shows the process as well.
+
+![manager](manager.gif)
+
+## Did somebody called SQL?
+Yes, That's right. All this is possible thanks to SQL and MYSQL, to store, interact, and manipulate data in real time.
 
 
 
@@ -115,51 +141,9 @@ There are more to the logic which is shown in a nutshell as following flowchart
 <!-- put snippets of code inside ``` ``` so it will look like code -->
 <!-- if you want to put blockquotes use a > -->
 
-This block of the code shows the process of collecting inputs from the user and providing appropriate logic channels based on the validation analysis of those input as the following:
 
-1) If neither action nor the search item is provided by the user, Liri will provide the list of actions to the user and also asks to enter a search item later on.
-2) If the action is provided, Liri checks to see if it is among the acceptable ones; if so and if the asked request is  "concert this" Liri asks user to enter a search item. If action is either "spotify-this-song" or "movie-this" it will provide a default for the searchName. Then, it calls for the appropriate searching action.
-3)If both action and search item are provided and action is in the acceptable list, then Liri calls for the appropriate channel of search.
 
 ```
-
-function getInput (){
-    
-    var data =  process.argv;
-    for(var i = 2 ; i < data.length ; i++) {
-        newLog = newLog + " " + data[i];
-    } 
-    updateLog(newLog);
-
-    if (data.length === 2 ){
-        askForAction();
-    } 
-    else if (data.length === 3){
-        action = data[2];
-        if (validate (action)){
-            console.log("you didn't enter a search item for the action, default would be used if applicable");
-
-            if (action === "spotify-this-song"){
-                searchName = "The+Sign";
-            }
-            if (action === "movie-this"){
-                searchName = "Mr.+Nobody";
-            }  
-        } else {
-            console.log ("seems that the action you asked is not among our list of acceptable actions");
-            askForAction();
-        }    
-    } else {
-        action = data[2];
-        searchName = data[3];
-        for(var i = 4; i < data.length ; i++){
-            searchName = searchName + " " + data[i];
-        }
-        console.log("searchName  is     " , searchName);
-    }  
-    return searchName;
-}
-
 
 ```
 
