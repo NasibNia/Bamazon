@@ -83,7 +83,7 @@ The governing logic behind the scene is as follows:
 Also, the following clip shows how YORSTOR works on the customer side:
 It can be seen in the video, how YORSTOR validates the customer inputs and provide the appropriate follow up command afterwards;
 
-![costumer](images/costumer.gif)
+![costumer](images/customer.gif)
 
 ## What happens in the manager journey
 
