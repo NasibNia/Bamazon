@@ -1,6 +1,6 @@
 <!-- Put the name of the project after the # -->
 <!-- the # means h1  -->
-# YORSTORE!
+# YORSTOR is YOUR STORE indeeds!
 
 <!-- Put a description of what the project is -->
 
