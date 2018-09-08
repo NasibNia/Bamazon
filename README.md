@@ -83,7 +83,7 @@ The governing logic behind the scene is as follows:
 Also, the following clip shows how YORSTOR works on the customer side:
 It can be seen in the video, how YORSTOR validates the customer inputs and provide the appropriate follow up command afterwards;
 
-![costumer](costumer.gif)
+![costumer](images/costumer.gif)
 
 ## What happens in the manager journey
 
@@ -105,7 +105,7 @@ YORSTOR provides the following options to managers:
 
 The following clip shows the process as well.
 
-![manager](manager.gif)
+![manager](images/manager.gif)
 
 ## Did somebody called SQL?
 Yes, That's right. All this is possible thanks to SQL and MYSQL, to store, interact, and manipulate data in real time.
